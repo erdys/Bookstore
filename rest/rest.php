@@ -1,4 +1,7 @@
 <?php
+
+header('Access-Control-Allow-Origin:*');
+
 //load DB config
 require_once __DIR__.'/config/db.php';
 
