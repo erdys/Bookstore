@@ -83,7 +83,7 @@ $(document).ready(function(){
             addBook(result.success[0]);
         }).fail(function(xhr,cod){
             console.log(xhr,cod);
-        })       
+        })
     });
 
     $('#bookEdit').on('submit',function(e){
