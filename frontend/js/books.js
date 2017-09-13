@@ -62,11 +62,19 @@ $(document).ready(function(){
         var elementSelect = `<option value="${book.id}">${book.id} - ${book.title}</option>`;   
         $('#booksList').append(element);
         $('#bookEditSelect').append(elementSelect);
+        console.log();
     }
+
+    function addAuthor(author){
+        var elementSelectA = `<option value="${author.id}">${author.id} - ${author.name} ${author.surname}</option>`;   
+        $('#author_id').append(elementSelectA);
+    }
+
     //Submit
     $('#bookAdd').on('submit',function(e){
         e.preventDefault();
         var title = $('#title').val();
+        var author_id = $('#author_id').val();
         var description = $('#description').val();
         if(title.length==0 && description.length==0){
             return;
@@ -75,6 +83,7 @@ $(document).ready(function(){
             url:`${API_HOST}/book`,
             data:{
                 title: title,
+                author_id: author_id,
                 description: description
             },
             method:"POST",
@@ -114,7 +123,8 @@ $(document).ready(function(){
         url:`${API_HOST}/book`,
         method:'GET',
         dataType:'json'
-    }).done(function(result){        
+    }).done(function(result){
         result.success.forEach((e)=>addBook(e));
+        result.success.forEach((e)=>addAuthor(e));
     });
 });
