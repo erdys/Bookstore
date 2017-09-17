@@ -13,10 +13,8 @@ $(document).ready(function(){
     });
 
     $(document).on('click','.btn-author-show-books',function(){
-        $(this).off('click');
         var authorID = $(this).data('id');
-        var authorBooks = $(this).parent().parent().find('#authorBooksSelectPanel');
-        var authorBooksSelect = authorBooks.children('#authorBooksSelect');
+        var authorBooksList = $(this).parent().parent().find('.authorBooksList');
         $.ajax({
             url:`${API_HOST}/author/${authorID}`,
             method:'GET',
@@ -24,12 +22,12 @@ $(document).ready(function(){
         }).done(function(result){
             var booksLength = result.success[0].books.length;
             if (booksLength > 0) {
-                authorBooks.show();
+                authorBooksList.show();
             } else {
                 showModal('Brak książek dla autora');
             }
             for (var i = 0; i < booksLength; i++) {
-                authorBooksSelect.append('<li>' + `${result.success[0].books[i].title}`+'</li>');
+                authorBooksList.append('<li>'+ `${result.success[0].books[i].title}` +'</li>');
             }
         });
     });
@@ -42,9 +40,7 @@ $(document).ready(function(){
                                                 class="fa fa-trash"></i></button>
                                     <button data-id="${author.id}" class="btn btn-primary pull-right btn-xs btn-author-show-books"><i class="fa fa-info-circle"></i></button>
                                 </div>
-                                <div class="panel-heading" id="authorBooksSelectPanel" style="display: none;">
-                                     <ul id="authorBooksSelect"></ul>
-                                </div>
+                                <ul class="authorBooksList"></ul>
                             </div>
                         </li>`;
         var elementSelect = `<option value="${author.id}">${author.name} ${author.surname}</option>`;   
