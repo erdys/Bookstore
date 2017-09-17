@@ -36,15 +36,17 @@ $(document).ready(function(){
                 var bookID = $('#bookEdit').find('#id');
                 var title = $('#bookEdit').find('#title');
                 var description = $('#bookEdit').find('#description');
+                var author = $('#bookEdit').find('#author_id_edit');
                 bookID.val(result.success[0].id);
                 title.val(result.success[0].title);
                 description.val(result.success[0].description);
+                author.val(result.success[0].author_id);
             });
         } else {
             $('#bookEdit').hide();
         }
     });
-    
+   
     //addBook()
     function addBook(book){
         var element = `<li class="list-group-item">
@@ -59,15 +61,15 @@ $(document).ready(function(){
                             <div class="panel-body book-description">${book.description}</div>
                         </div>
                     </li>`;
-        var elementSelect = `<option value="${book.id}">${book.id} - ${book.title}</option>`;   
+        var elementSelect = `<option value="${book.id}">${book.title}</option>`;   
         $('#booksList').append(element);
         $('#bookEditSelect').append(elementSelect);
-        console.log();
     }
 
     function addAuthor(author){
-        var elementSelectA = `<option value="${author.id}">${author.id} - ${author.name} ${author.surname}</option>`;   
-        $('#author_id').append(elementSelectA);
+        var elementSelect = `<option value="${author.id}">${author.name} ${author.surname}</option>`;  
+        $('#author_id').append(elementSelect);
+        $('#author_id_edit').append(elementSelect);
     }
 
     //Submit
@@ -90,6 +92,10 @@ $(document).ready(function(){
             dataType:"json"
         }).done(function(result){            
             addBook(result.success[0]);
+            $('#title').val('');
+            $('#author_id').val('');
+            $('#description').val('');
+            showModal('Dodano książke');
         }).fail(function(xhr,cod){
             console.log(xhr,cod);
         })
@@ -100,6 +106,7 @@ $(document).ready(function(){
         var bookID = $('#bookEdit').find('#id').val();
         var title = $('#bookEdit').find('#title').val();
         var description = $('#bookEdit').find('#description').val();
+        var author = $('#bookEdit').find('#author_id_edit').val();
         if(title.length==0 && description.length==0){
             return;
         }
@@ -107,7 +114,8 @@ $(document).ready(function(){
             url:`${API_HOST}/book/${bookID}`,
             data:{
                 title: title,
-                description: description
+                description: description,
+                author_id: author
             },
             method:"PATCH",
             dataType:"json"
@@ -124,7 +132,14 @@ $(document).ready(function(){
         method:'GET',
         dataType:'json'
     }).done(function(result){
+        // console.log(result);
         result.success.forEach((e)=>addBook(e));
+    });
+    $.ajax({
+        url:`${API_HOST}/author`,
+        method:'GET',
+        dataType:'json'
+    }).done(function(result){
         result.success.forEach((e)=>addAuthor(e));
     });
 });

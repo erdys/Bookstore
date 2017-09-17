@@ -12,16 +12,42 @@ $(document).ready(function(){
         });
     });
 
+    $(document).on('click','.btn-author-show-books',function(){
+        $(this).off('click');
+        var authorID = $(this).data('id');
+        var authorBooks = $(this).parent().parent().find('#authorBooksSelectPanel');
+        var authorBooksSelect = authorBooks.children('#authorBooksSelect');
+        $.ajax({
+            url:`${API_HOST}/author/${authorID}`,
+            method:'GET',
+            dataType:'json'
+        }).done(function(result){
+            var booksLength = result.success[0].books.length;
+            if (booksLength > 0) {
+                authorBooks.show();
+            } else {
+                showModal('Brak książek dla autora');
+            }
+            for (var i = 0; i < booksLength; i++) {
+                authorBooksSelect.append('<li>' + `${result.success[0].books[i].title}`+'</li>');
+            }
+        });
+    });
+
     function addAuthor(author){
         var element = `<li class="list-group-item">
                             <div class="panel panel-default">
                                 <div class="panel-heading"><span class="authorTitle">${author.name} ${author.surname}</span>
                                     <button data-id="${author.id}" class="btn btn-danger pull-right btn-xs btn-author-remove"><i
                                                 class="fa fa-trash"></i></button>
+                                    <button data-id="${author.id}" class="btn btn-primary pull-right btn-xs btn-author-show-books"><i class="fa fa-info-circle"></i></button>
+                                </div>
+                                <div class="panel-heading" id="authorBooksSelectPanel" style="display: none;">
+                                     <ul id="authorBooksSelect"></ul>
                                 </div>
                             </div>
                         </li>`;
-        var elementSelect = `<option value="${author.id}">${author.id} - ${author.name} ${author.surname}</option>`;   
+        var elementSelect = `<option value="${author.id}">${author.name} ${author.surname}</option>`;   
         $('#authorsList').append(element);
         $('#authorEditSelect').append(elementSelect);
     }
@@ -29,7 +55,6 @@ $(document).ready(function(){
     $(document).on('change','#authorEditSelect',function(){
         var optionSelected = $("option:selected", this);
         var authorID = this.value;
-        // console.log(authorID);
         if (authorID > 0) {
             $.ajax({
                 url:`${API_HOST}/author/${authorID}`,
@@ -64,8 +89,11 @@ $(document).ready(function(){
             },
             method:"POST",
             dataType:"json"
-        }).done(function(result){            
+        }).done(function(result){
             addAuthor(result.success[0]);
+            $('#name').val('');
+            $('#surname').val('');
+            showModal('Dodano autora');
         }).fail(function(xhr,cod){
             console.log(xhr,cod);
         })
@@ -88,7 +116,6 @@ $(document).ready(function(){
             method:"PATCH",
             dataType:"json"
         }).done(function(result){
-            // $('#authorEdit').hide();
             window.location.reload(true);
         }).fail(function(xhr,cod){
             console.log(xhr,cod);
